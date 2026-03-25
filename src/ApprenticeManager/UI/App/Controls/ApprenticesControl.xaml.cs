@@ -7,29 +7,51 @@ using System.Windows.Controls;
 
 namespace ApprenticeManager.UI.App.Controls;
 
+/// <summary>UserControl that lists all apprentices with search and provides CRUD actions.</summary>
 public partial class ApprenticesControl : UserControl
 {
     private IServiceProvider? _serviceProvider;
+
+    /// <summary>Raised after an apprentice is added or deleted so the role switch can refresh.</summary>
+    public event EventHandler? ApprenticeListChanged;
 
     public ApprenticesControl()
     {
         InitializeComponent();
     }
 
+    /// <summary>Injects the DI container and triggers the first data load once the control is ready.</summary>
     public void Initialize(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
         Loaded += async (_, _) => await LoadDataAsync();
     }
 
-    private async Task LoadDataAsync()
+    /// <summary>Loads all apprentices (or a filtered subset) and binds them to the grid.</summary>
+    private async Task LoadDataAsync(string? searchTerm = null)
     {
         using var scope = _serviceProvider!.CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IApprenticeService>();
-        var apprentices = await service.GetAllAsync();
+        var apprentices = string.IsNullOrWhiteSpace(searchTerm)
+            ? await service.GetAllAsync()
+            : await service.SearchAsync(searchTerm);
         ApprenticesGrid.ItemsSource = apprentices.ToList();
     }
 
+    /// <summary>Filters the grid as the user types in the search box.</summary>
+    private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        await LoadDataAsync(SearchBox.Text);
+    }
+
+    /// <summary>Clears the search box and reloads all apprentices.</summary>
+    private async void ClearSearch_Click(object sender, RoutedEventArgs e)
+    {
+        SearchBox.Text = string.Empty;
+        await LoadDataAsync();
+    }
+
+    /// <summary>Opens the add dialog and persists the new apprentice if confirmed.</summary>
     private async void AddButton_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new ApprenticeDialog { Owner = Window.GetWindow(this) };
@@ -40,7 +62,8 @@ public partial class ApprenticesControl : UserControl
                 using var scope = _serviceProvider!.CreateScope();
                 var service = scope.ServiceProvider.GetRequiredService<IApprenticeService>();
                 await service.AddAsync(dialog.Result);
-                await LoadDataAsync();
+                await LoadDataAsync(SearchBox.Text);
+                ApprenticeListChanged?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
@@ -49,6 +72,7 @@ public partial class ApprenticesControl : UserControl
         }
     }
 
+    /// <summary>Opens the edit dialog for the selected apprentice and saves any changes.</summary>
     private async void EditButton_Click(object sender, RoutedEventArgs e)
     {
         if (ApprenticesGrid.SelectedItem is not Apprentice selected) return;
@@ -61,7 +85,7 @@ public partial class ApprenticesControl : UserControl
                 using var scope = _serviceProvider!.CreateScope();
                 var service = scope.ServiceProvider.GetRequiredService<IApprenticeService>();
                 await service.UpdateAsync(dialog.Result);
-                await LoadDataAsync();
+                await LoadDataAsync(SearchBox.Text);
             }
             catch (Exception ex)
             {
@@ -70,6 +94,7 @@ public partial class ApprenticesControl : UserControl
         }
     }
 
+    /// <summary>Prompts for confirmation and deletes the selected apprentice including all related data.</summary>
     private async void DeleteButton_Click(object sender, RoutedEventArgs e)
     {
         if (ApprenticesGrid.SelectedItem is not Apprentice selected) return;
@@ -85,7 +110,8 @@ public partial class ApprenticesControl : UserControl
                 using var scope = _serviceProvider!.CreateScope();
                 var service = scope.ServiceProvider.GetRequiredService<IApprenticeService>();
                 await service.DeleteAsync(selected.Id);
-                await LoadDataAsync();
+                await LoadDataAsync(SearchBox.Text);
+                ApprenticeListChanged?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
@@ -94,8 +120,9 @@ public partial class ApprenticesControl : UserControl
         }
     }
 
+    /// <summary>Reloads the apprentice list from the database.</summary>
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
-        await LoadDataAsync();
+        await LoadDataAsync(SearchBox.Text);
     }
 }

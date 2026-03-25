@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApprenticeManager.Services;
 
+/// <summary>EF Core–backed service for apprentice CRUD and search operations.</summary>
 public class ApprenticeService : IApprenticeService
 {
     private readonly AppDbContext _db;
@@ -13,6 +14,7 @@ public class ApprenticeService : IApprenticeService
         _db = db;
     }
 
+    /// <summary>Returns all apprentices ordered alphabetically by last name.</summary>
     public async Task<IReadOnlyList<Apprentice>> GetAllAsync()
     {
         return await _db.Apprentices
@@ -21,11 +23,13 @@ public class ApprenticeService : IApprenticeService
             .ToListAsync();
     }
 
+    /// <summary>Returns a single apprentice by primary key, or null if not found.</summary>
     public async Task<Apprentice?> GetByIdAsync(int id)
     {
         return await _db.Apprentices.FindAsync(id);
     }
 
+    /// <summary>Searches apprentices by name, company, or occupation (case-insensitive).</summary>
     public async Task<IReadOnlyList<Apprentice>> SearchAsync(string term)
     {
         var lower = term.ToLowerInvariant();
@@ -40,6 +44,7 @@ public class ApprenticeService : IApprenticeService
             .ToListAsync();
     }
 
+    /// <summary>Persists a new apprentice and returns the saved entity.</summary>
     public async Task<Apprentice> AddAsync(Apprentice apprentice)
     {
         apprentice.CreatedAt = DateTime.UtcNow;
@@ -48,6 +53,7 @@ public class ApprenticeService : IApprenticeService
         return apprentice;
     }
 
+    /// <summary>Updates an existing apprentice record.</summary>
     public async Task<Apprentice> UpdateAsync(Apprentice apprentice)
     {
         _db.Apprentices.Update(apprentice);
@@ -55,6 +61,7 @@ public class ApprenticeService : IApprenticeService
         return apprentice;
     }
 
+    /// <summary>Deletes an apprentice and all related data by ID; throws if not found.</summary>
     public async Task DeleteAsync(int id)
     {
         var apprentice = await _db.Apprentices.FindAsync(id)

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApprenticeManager.Data;
 
+/// <summary>EF Core database context for the Apprentice Manager application.</summary>
 public class AppDbContext : DbContext
 {
     public const string ConnectionString = "Data Source=apprentices.db";
@@ -11,6 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<Grade> Grades => Set<Grade>();
     public DbSet<LearningJournal> LearningJournals => Set<LearningJournal>();
+    public DbSet<VocationalTrainer> VocationalTrainers => Set<VocationalTrainer>();
+    public DbSet<Company> Companies => Set<Company>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
@@ -94,6 +97,31 @@ public class AppDbContext : DbContext
                 .WithMany(a => a.LearningJournals)
                 .HasForeignKey(e => e.ApprenticeId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<VocationalTrainer>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.FirstName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.LastName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Company).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.Property(e => e.Phone).HasMaxLength(50);
+            entity.Property(e => e.Notes).HasMaxLength(2000);
+            entity.Property(e => e.CreatedAt).IsRequired();
+        });
+
+        modelBuilder.Entity<Company>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Address).HasMaxLength(400);
+            entity.Property(e => e.Phone).HasMaxLength(50);
+            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.Property(e => e.Notes).HasMaxLength(2000);
+            entity.Property(e => e.CreatedAt).IsRequired();
         });
     }
 }

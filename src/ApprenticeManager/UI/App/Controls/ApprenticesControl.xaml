@@ -3,11 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <DataGrid x:Name="ApprenticesGrid" AutoGenerateColumns="False"
+        <!-- Suchleiste -->
+        <Border Background="#f0f4f8" BorderBrush="#d0d8e4" BorderThickness="0,0,0,1" Padding="8,6">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Suche:" VerticalAlignment="Center" Margin="0,0,8,0"
+                           FontWeight="SemiBold" Foreground="#1e3a5f"/>
+                <TextBox x:Name="SearchBox" Width="260" Padding="4,3"
+                         TextChanged="SearchBox_TextChanged"
+                         ToolTip="Nach Name, Betrieb oder Beruf suchen"/>
+                <Button Content="✕" Width="26" Margin="4,0,0,0" Padding="0"
+                        Click="ClearSearch_Click" ToolTip="Suche löschen"/>
+            </StackPanel>
+        </Border>
+
+        <DataGrid x:Name="ApprenticesGrid" Grid.Row="1" AutoGenerateColumns="False"
                   IsReadOnly="True" SelectionMode="Single"
                   CanUserAddRows="False" Margin="5,5,5,0">
             <DataGrid.Columns>
@@ -34,7 +48,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5">
             <Button Content="Hinzufügen" Padding="10,5" Margin="0,0,5,0" Click="AddButton_Click"/>
             <Button Content="Bearbeiten" Padding="10,5" Margin="0,0,5,0" Click="EditButton_Click"/>
             <Button Content="Löschen" Padding="10,5" Margin="0,0,5,0" Click="DeleteButton_Click"/>

@@ -2,29 +2,61 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:ApprenticeManager.UI.App.Controls"
-        Title="Apprentice Manager" Height="680" Width="1100"
-        WindowStartupLocation="CenterScreen" MinWidth="800" MinHeight="500">
+        Title="Apprentice Manager" Height="720" Width="1200"
+        WindowStartupLocation="CenterScreen" MinWidth="900" MinHeight="550">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Header -->
         <Border Background="#1e3a5f" Padding="15,10">
-            <TextBlock Text="🎓 Apprentice Manager"
-                       Foreground="White" FontSize="20" FontWeight="Bold"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="🎓 Apprentice Manager"
+                           Foreground="White" FontSize="20" FontWeight="Bold"
+                           VerticalAlignment="Center"/>
+
+                <!-- Rollen-Wechsel oben rechts -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Ansicht:" Foreground="#aac8e8" VerticalAlignment="Center"
+                               Margin="0,0,8,0" FontSize="13"/>
+                    <ComboBox x:Name="RoleSwitchComboBox" Width="210"
+                              DisplayMemberPath="Label"
+                              SelectionChanged="RoleSwitchComboBox_SelectionChanged"
+                              DropDownOpened="RoleSwitchComboBox_DropDownOpened"
+                              FontSize="13" VerticalContentAlignment="Center"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <TabControl Grid.Row="1" Margin="5">
-            <TabItem Header="Lernende" FontSize="13" Padding="10,4">
+        <!-- Tab-Bereich -->
+        <TabControl x:Name="MainTabControl" Grid.Row="1" Margin="5">
+
+            <!-- Lehrlingsbetreuer-Tabs (nur in Betreuer-Ansicht sichtbar) -->
+            <TabItem x:Name="ApprenticesTabItem" Header="Lernende" FontSize="13" Padding="10,4">
                 <controls:ApprenticesControl x:Name="ApprenticesTab"/>
             </TabItem>
-            <TabItem Header="Noten" FontSize="13" Padding="10,4">
+            <TabItem x:Name="TrainersTabItem" Header="Lehrlingsbetreuer" FontSize="13" Padding="10,4">
+                <controls:VocationalTrainersControl x:Name="TrainersTab"/>
+            </TabItem>
+            <TabItem x:Name="CompaniesTabItem" Header="Betriebe" FontSize="13" Padding="10,4">
+                <controls:CompaniesControl x:Name="CompaniesTab"/>
+            </TabItem>
+
+            <!-- Immer sichtbare Tabs -->
+            <TabItem x:Name="GradesTabItem" Header="Noten" FontSize="13" Padding="10,4">
                 <controls:GradesControl x:Name="GradesTab"/>
             </TabItem>
-            <TabItem Header="Lernjournal" FontSize="13" Padding="10,4">
+            <TabItem x:Name="JournalTabItem" Header="Lernjournal" FontSize="13" Padding="10,4">
                 <controls:LearningJournalControl x:Name="JournalTab"/>
             </TabItem>
+
         </TabControl>
     </Grid>
 </Window>

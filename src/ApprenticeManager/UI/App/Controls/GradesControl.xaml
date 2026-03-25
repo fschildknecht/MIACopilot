@@ -1,6 +1,12 @@
 <UserControl x:Class="ApprenticeManager.UI.App.Controls.GradesControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:ApprenticeManager.UI.App.Converters">
+    <UserControl.Resources>
+        <conv:GradeColorConverter x:Key="GradeColorConverter"/>
+        <conv:PassingGradeConverter x:Key="PassingGradeConverter"/>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -9,12 +15,15 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Lernender Auswahl -->
-        <StackPanel Orientation="Horizontal" Margin="5" VerticalAlignment="Center">
-            <TextBlock Text="Lernender:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold"/>
-            <ComboBox x:Name="ApprenticeComboBox" Width="220" DisplayMemberPath="FullName"
-                      SelectionChanged="ApprenticeComboBox_SelectionChanged"/>
-        </StackPanel>
+        <!-- Toolbar mit Lernender-Auswahl -->
+        <Border Background="#f0f4f8" BorderBrush="#d0d8e4" BorderThickness="0,0,0,1" Padding="8,6">
+            <StackPanel x:Name="ApprenticeSelector" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Lernender:" VerticalAlignment="Center" Margin="0,0,8,0"
+                           FontWeight="SemiBold" Foreground="#1e3a5f"/>
+                <ComboBox x:Name="ApprenticeComboBox" Width="220" DisplayMemberPath="FullName"
+                          SelectionChanged="ApprenticeComboBox_SelectionChanged"/>
+            </StackPanel>
+        </Border>
 
         <!-- Fächer -->
         <Grid Grid.Row="1">
@@ -23,27 +32,39 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Fächer" FontWeight="Bold" Margin="5,3,0,2"/>
+            <TextBlock Text="Fächer" FontWeight="Bold" FontSize="13" Foreground="#1e3a5f" Margin="8,5,0,3"/>
             <DataGrid x:Name="SubjectsGrid" Grid.Row="1" AutoGenerateColumns="False"
                       IsReadOnly="True" SelectionMode="Single" CanUserAddRows="False"
                       Margin="5,0,5,0" SelectionChanged="SubjectsGrid_SelectionChanged">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Fach" Binding="{Binding Name}" Width="*"/>
-                    <DataGridTextColumn Header="Durchschnittsnote" Width="140">
+                    <DataGridTextColumn Header="Ø Note" Width="90">
                         <DataGridTextColumn.Binding>
                             <Binding Path="AverageGrade" StringFormat="F2"/>
                         </DataGridTextColumn.Binding>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="Anzahl Noten" Binding="{Binding Grades.Count}" Width="110"/>
+                    <DataGridTextColumn Header="Anzahl" Binding="{Binding Grades.Count}" Width="70"/>
                 </DataGrid.Columns>
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding AverageGrade, Converter={StaticResource PassingGradeConverter}}" Value="True">
+                                <Setter Property="Background" Value="#e8f5e9"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding AverageGrade, Converter={StaticResource PassingGradeConverter}}" Value="False">
+                                <Setter Property="Background" Value="#ffebee"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
             </DataGrid>
-            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5,3">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5,4">
                 <Button Content="Fach hinzufügen" Padding="10,5" Margin="0,0,5,0" Click="AddSubjectButton_Click"/>
                 <Button Content="Fach löschen" Padding="10,5" Click="DeleteSubjectButton_Click"/>
             </StackPanel>
         </Grid>
 
-        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Background="LightGray"/>
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Background="#d0d8e4"/>
 
         <!-- Noten für gewähltes Fach -->
         <Grid Grid.Row="3">
@@ -52,16 +73,21 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock x:Name="GradesHeader" Text="Noten" FontWeight="Bold" Margin="5,3,0,2"/>
+            <TextBlock x:Name="GradesHeader" Text="Noten" FontWeight="Bold" FontSize="13"
+                       Foreground="#1e3a5f" Margin="8,5,0,3"/>
             <DataGrid x:Name="GradesGrid" Grid.Row="1" AutoGenerateColumns="False"
                       IsReadOnly="True" SelectionMode="Single" CanUserAddRows="False"
                       Margin="5,0,5,0">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Note" Width="80">
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Value" StringFormat="F1"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Note" Width="80" SortMemberPath="Value">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Value, StringFormat=F1}"
+                                           FontWeight="Bold" HorizontalAlignment="Center"
+                                           Foreground="{Binding Value, Converter={StaticResource GradeColorConverter}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Datum" Width="100">
                         <DataGridTextColumn.Binding>
                             <Binding Path="Date" StringFormat="dd.MM.yyyy"/>
@@ -70,7 +96,7 @@
                     <DataGridTextColumn Header="Bemerkungen" Binding="{Binding Notes}" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5,3">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5,4">
                 <Button Content="Note hinzufügen" Padding="10,5" Margin="0,0,5,0" Click="AddGradeButton_Click"/>
                 <Button Content="Note löschen" Padding="10,5" Click="DeleteGradeButton_Click"/>
             </StackPanel>

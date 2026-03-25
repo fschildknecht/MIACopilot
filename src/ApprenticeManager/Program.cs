@@ -17,6 +17,9 @@ services.AddDbContext<AppDbContext>(options =>
 services.AddScoped<IApprenticeService, ApprenticeService>();
 services.AddScoped<IGradeService, GradeService>();
 services.AddScoped<ILearningJournalService, LearningJournalService>();
+services.AddScoped<IVocationalTrainerService, VocationalTrainerService>();
+services.AddScoped<ICompanyService, CompanyService>();
+services.AddSingleton<AppState>();
 services.AddScoped<ApprenticeValidator>();
 services.AddScoped<ListCommand>();
 services.AddScoped<AddCommand>();
