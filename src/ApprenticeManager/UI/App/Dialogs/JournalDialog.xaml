@@ -1,0 +1,51 @@
+<Window x:Class="ApprenticeManager.UI.App.Dialogs.JournalDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Lernjournaleintrag" Height="480" Width="520"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Kalenderwoche *" VerticalAlignment="Center" Margin="0,5"/>
+                <TextBox x:Name="KWBox" Grid.Row="0" Grid.Column="1" Margin="0,5"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Jahr *" VerticalAlignment="Center" Margin="0,5"/>
+                <TextBox x:Name="JahrBox" Grid.Row="1" Grid.Column="1" Margin="0,5"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Betriebliche&#x0a;Tätigkeiten *" VerticalAlignment="Top" Margin="0,8,0,0"/>
+                <TextBox x:Name="BetriebBox" Grid.Row="2" Grid.Column="1" Margin="0,5"
+                         Height="90" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Schulische&#x0a;Tätigkeiten" VerticalAlignment="Top" Margin="0,8,0,0"/>
+                <TextBox x:Name="SchuleBox" Grid.Row="3" Grid.Column="1" Margin="0,5"
+                         Height="90" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Reflexion" VerticalAlignment="Top" Margin="0,8,0,0"/>
+                <TextBox x:Name="ReflexionBox" Grid.Row="4" Grid.Column="1" Margin="0,5"
+                         Height="90" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+            </Grid>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Speichern" Width="90" Margin="0,0,8,0" Click="OkButton_Click" IsDefault="True"/>
+            <Button Content="Abbrechen" Width="90" Click="CancelButton_Click" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

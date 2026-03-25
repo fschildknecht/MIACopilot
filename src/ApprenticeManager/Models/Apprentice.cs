@@ -15,5 +15,8 @@ public class Apprentice
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }
 
+    public ICollection<Subject> Subjects { get; set; } = new List<Subject>();
+    public ICollection<LearningJournal> LearningJournals { get; set; } = new List<LearningJournal>();
+
     public string FullName => $"{FirstName} {LastName}";
 }
